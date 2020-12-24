@@ -11,6 +11,17 @@
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
-	<dict/>
+	<dict>
+		<key>serial</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>serialTests</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
 </dict>
 </plist>
