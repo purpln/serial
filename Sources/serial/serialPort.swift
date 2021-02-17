@@ -13,7 +13,7 @@ public enum serialParity: Int {
     case odd
 }
 
-public final class serialPort {
+public class serialPort {
     private var fileDescriptor: Int32 = 0
     private var originalPortOptions = termios()
     private var readTimer: DispatchSourceTimer?
@@ -37,8 +37,6 @@ public final class serialPort {
     public var opened: ((_ port: serialPort) -> Void)?
     public var closed: ((_ port: serialPort) -> Void)?
     public var removed: ((_ port: serialPort) -> Void)?
-    
-    public init() {}
     
     public init(_ portName: String) {
         name = portName

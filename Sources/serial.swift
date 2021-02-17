@@ -2,7 +2,7 @@ import AppKit
 import IOKit
 import IOKit.serial
 
-public final class serial:ObservableObject{
+public class serial:ObservableObject{
     @Published public var ports:[String] = []
     
     public private(set) var availablePorts = [serialPort]()
