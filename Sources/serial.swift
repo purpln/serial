@@ -3,7 +3,7 @@ import IOKit
 import IOKit.serial
 
 public final class serial:ObservableObject{
-    @Published var ports:[String] = []
+    @Published public var ports:[String] = []
     
     public private(set) var availablePorts = [serialPort]()
     //public var updatedAvailablePortsHandler: (() -> Void)?
