@@ -1,5 +1,5 @@
 import XCTest
-@testable import serial
+@testable import Serial
 
 final class SerialTests: XCTestCase {
     func testExample() {

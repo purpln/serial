@@ -2,18 +2,19 @@ import AppKit
 import IOKit
 import IOKit.serial
 
-public class serial:ObservableObject{
+@available(OSX 10.15, *)
+public class Serial:ObservableObject{
     @Published public var ports:[String] = []
     
-    public private(set) var availablePorts = [serialPort]()
+    public private(set) var availablePorts = [SerialPort]()
     //public var updatedAvailablePortsHandler: (() -> Void)?
 
-    private let detector = serialDetector()
+    private let detector = SerialDetector()
     private var sleepObserver: NSObjectProtocol?
     private var wakeObserver: NSObjectProtocol?
     private var terminateObserver: NSObjectProtocol?
     
-    public init?() {
+    public init() {
         registerNotifications()
         setAvailablePorts()
     }
@@ -80,7 +81,7 @@ public class serial:ObservableObject{
         let portList = getPortList(device)
         portList.forEach { portName in
             ports.append(portName)
-            availablePorts.append(serialPort(portName))
+            availablePorts.append(SerialPort(portName))
         }
     }
     
@@ -91,7 +92,7 @@ public class serial:ObservableObject{
             if !availablePorts.contains(where: { port -> Bool in
                 return port.name == portName
             }) {
-                availablePorts.insert(serialPort(portName), at: 0)
+                availablePorts.insert(SerialPort(portName), at: 0)
             }
             
             if !ports.contains(portName){
@@ -104,7 +105,7 @@ public class serial:ObservableObject{
     private func removedPorts() {
         let device = findDevice()
         let portList = getPortList(device)
-        let removedPorts: [serialPort] = availablePorts.filter { (port) -> Bool in
+        let removedPorts: [SerialPort] = availablePorts.filter { (port) -> Bool in
             return !portList.contains(port.name)
         }
         removedPorts.forEach { (port) in
