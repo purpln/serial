@@ -1,4 +1,3 @@
-#if os(macOS)
 import IOKit.usb
 
 final class serialDetector {
@@ -49,4 +48,4 @@ final class serialDetector {
         IONotificationPortDestroy(notificationPort)
     }
 }
-#endif
+

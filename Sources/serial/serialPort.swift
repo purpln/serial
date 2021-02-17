@@ -51,7 +51,6 @@ public final class serialPort {
     }
     
     public func open() {
-        print("open")
         var fd: Int32 = -1
         
         fd = Darwin.open(name.cString(using: String.Encoding.ascii)!, O_RDWR | O_NOCTTY | O_NONBLOCK)
@@ -61,7 +60,9 @@ public final class serialPort {
         fileDescriptor = fd
         setOptions()
         readTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
-        readTimer?.schedule(deadline: DispatchTime.now(), repeating: DispatchTimeInterval.nanoseconds(Int(10 * NSEC_PER_MSEC)), leeway: DispatchTimeInterval.nanoseconds(Int(5 * NSEC_PER_MSEC)))
+        readTimer?.schedule(deadline: DispatchTime.now(),
+                            repeating: DispatchTimeInterval.nanoseconds(Int(10 * NSEC_PER_MSEC)),
+                            leeway: DispatchTimeInterval.nanoseconds(Int(5 * NSEC_PER_MSEC)))
         readTimer?.setEventHandler(handler: { [weak self] in
             self?.read()
         })
@@ -144,7 +145,7 @@ public final class serialPort {
         }
     }
     
-    func remove() {
+    func portRemoved() {
         readTimer?.cancel()
         readTimer = nil
         if tcdrain(fileDescriptor) == -1 { return }
