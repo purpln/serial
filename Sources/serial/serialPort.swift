@@ -1,30 +1,30 @@
 import Foundation
 
-public enum serialPortState: Int {
+public enum SerialPortState: Int {
     case open
     case close
     case sleeping
     case removed
 }
 
-public enum serialParity: Int {
+public enum SerialParity: Int {
     case none
     case even
     case odd
 }
 
-public class serialPort {
+public class SerialPort {
     private var fileDescriptor: Int32 = 0
     private var originalPortOptions = termios()
     private var readTimer: DispatchSourceTimer?
     
     public private(set) var name: String = ""
-    public private(set) var state: serialPortState = .close
+    public private(set) var state: SerialPortState = .close
     
     public var baudRate: BaudRate = .baud115200 {
         didSet { setOptions() }
     }
-    public var parity:serialParity = .none {
+    public var parity:SerialParity = .none {
         didSet { setOptions() }
     }
     public var stopBits: UInt32 = 1 {
@@ -33,10 +33,10 @@ public class serialPort {
     
     //
     public var received: ((_ texts: String) -> Void)?
-    public var failure: ((_ port: serialPort) -> Void)?
-    public var opened: ((_ port: serialPort) -> Void)?
-    public var closed: ((_ port: serialPort) -> Void)?
-    public var removed: ((_ port: serialPort) -> Void)?
+    public var failure: ((_ port: SerialPort) -> Void)?
+    public var opened: ((_ port: SerialPort) -> Void)?
+    public var closed: ((_ port: SerialPort) -> Void)?
+    public var removed: ((_ port: SerialPort) -> Void)?
     
     public init?(_ portName: String) {
         name = portName

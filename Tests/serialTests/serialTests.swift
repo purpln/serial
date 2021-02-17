@@ -1,7 +1,7 @@
 import XCTest
 @testable import serial
 
-final class serialTests: XCTestCase {
+final class SerialTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct

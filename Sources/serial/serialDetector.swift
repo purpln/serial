@@ -1,6 +1,6 @@
 import IOKit.usb
 
-final class serialDetector {
+final class SerialDetector {
     private let notificationPort = IONotificationPortCreate(kIOMasterPortDefault)
     private var addedIterator: io_iterator_t = 0
     private var removedIterator: io_iterator_t = 0
@@ -16,7 +16,7 @@ final class serialDetector {
         
         // MARK: ★★★ Added Notification ★★★ //
         let addedCallback: IOServiceMatchingCallback = { (pointer, iterator) in
-            let detector = Unmanaged<serialDetector>.fromOpaque(pointer!).takeUnretainedValue()
+            let detector = Unmanaged<SerialDetector>.fromOpaque(pointer!).takeUnretainedValue()
             detector.addedDeviceHandler?()
             while case let device = IOIteratorNext(iterator), device != IO_OBJECT_NULL {
                 IOObjectRelease(device)
@@ -29,7 +29,7 @@ final class serialDetector {
         
         // MARK: ★★★ Removed Notification ★★★ //
         let removedCallback: IOServiceMatchingCallback = { (pointer, iterator) in
-            let watcher = Unmanaged<serialDetector>.fromOpaque(pointer!).takeUnretainedValue()
+            let watcher = Unmanaged<SerialDetector>.fromOpaque(pointer!).takeUnretainedValue()
             watcher.removedDeviceHandler?()
             while case let device = IOIteratorNext(iterator), device != IO_OBJECT_NULL {
                 IOObjectRelease(device)

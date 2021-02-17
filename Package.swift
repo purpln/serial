@@ -3,16 +3,16 @@
 import PackageDescription
 
 let package = Package(
-    name: "serial",
+    name: "Serial",
     platforms: [
         .macOS(.v10_10)
     ],
     products: [
-        .library(name: "serial", targets: ["serial"]),
+        .library(name: "Serial", targets: ["Serial"]),
     ],
     dependencies: [],
     targets: [
-        .target(name: "serial", dependencies: []),
-        .testTarget(name: "serialTests", dependencies: ["serial"]),
+        .target(name: "Serial", dependencies: []),
+        .testTarget(name: "SerialTests", dependencies: ["Serial"]),
     ]
 )
