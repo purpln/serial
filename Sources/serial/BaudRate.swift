@@ -11,7 +11,7 @@ public enum BaudRate{
     case baud115200
     case baud230400
 
-    var speed: speed_t {
+    public var speed: speed_t {
         switch self {
         case .baud1200: return speed_t(B1200)
         case .baud2400: return speed_t(B2400)
@@ -25,7 +25,7 @@ public enum BaudRate{
         }
     }
     
-    var description: String {
+    public var description: String {
         switch self {
         case .baud1200: return "baud 1200"
         case .baud2400: return "baud 2400"

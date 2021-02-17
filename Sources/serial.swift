@@ -13,7 +13,7 @@ public final class serial:ObservableObject{
     private var wakeObserver: NSObjectProtocol?
     private var terminateObserver: NSObjectProtocol?
     
-    init() {
+    public init() {
         registerNotifications()
         setAvailablePorts()
     }
