@@ -38,6 +38,8 @@ public final class serialPort {
     public var closed: ((_ port: serialPort) -> Void)?
     public var removed: ((_ port: serialPort) -> Void)?
     
+    public init() {}
+    
     public init(_ portName: String) {
         name = portName
     }
