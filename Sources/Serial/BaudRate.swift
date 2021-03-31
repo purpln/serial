@@ -1,15 +1,7 @@
 import Foundation
 
-public enum BaudRate{
-    case baud1200
-    case baud2400
-    case baud4800
-    case baud9600
-    case baud19200
-    case baud38400
-    case baud57600
-    case baud115200
-    case baud230400
+public enum BaudRate {
+    case baud1200, baud2400, baud4800, baud9600, baud19200, baud38400, baud57600, baud115200, baud230400
 
     public var speed: speed_t {
         switch self {

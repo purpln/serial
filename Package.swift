@@ -4,15 +4,8 @@ import PackageDescription
 
 let package = Package(
     name: "serial",
-    platforms: [
-        .macOS(.v10_10)
-    ],
-    products: [
-        .library(name: "serial", targets: ["Serial"]),
-    ],
+    platforms: [ .macOS(.v10_10) ],
+    products: [ .library(name: "serial", targets: ["Serial"]) ],
     dependencies: [],
-    targets: [
-        .target(name: "Serial", dependencies: []),
-        .testTarget(name: "SerialTests", dependencies: ["Serial"]),
-    ]
+    targets: [ .target(name: "Serial", dependencies: []) ]
 )

@@ -2,10 +2,15 @@ import AppKit
 import IOKit
 import IOKit.serial
 
-@available(OSX 10.15, *)
-public class Serial:ObservableObject{
-    @Published public var ports:[String] = []
+public protocol SerialProtocol {
+    func ports(ports: [SerialPort])
+}
+
+public class Serial {
+    public let shared: Serial = Serial()
+    public var delegate: SerialProtocol?
     
+    public private(set) var ports: [String] = []
     public private(set) var availablePorts = [SerialPort]()
     //public var updatedAvailablePortsHandler: (() -> Void)?
 
@@ -14,41 +19,28 @@ public class Serial:ObservableObject{
     private var wakeObserver: NSObjectProtocol?
     private var terminateObserver: NSObjectProtocol?
     
-    public init() {
+    private init() {
         registerNotifications()
         setAvailablePorts()
     }
     
     deinit {
         let wsnc = NSWorkspace.shared.notificationCenter
-        if let sleepObserver = sleepObserver {
-            wsnc.removeObserver(sleepObserver)
-        }
-        if let wakeObserver = wakeObserver {
-            wsnc.removeObserver(wakeObserver)
-        }
-        let nc = NotificationCenter.default
-        if terminateObserver != nil {
-            nc.removeObserver(terminateObserver!)
-        }
+        if let sleepObserver = sleepObserver { wsnc.removeObserver(sleepObserver) }
+        if let wakeObserver = wakeObserver { wsnc.removeObserver(wakeObserver) }
+        if terminateObserver != nil { NotificationCenter.default.removeObserver(terminateObserver!) }
     }
     
-    // MARK: ★★★ Notifications ★★★
     private func registerNotifications() {
         
-        // MARK: ★★★ USB Detector ★★★
         detector.addedDeviceHandler = {
-            // It is necessary to wait for a while to be updated.
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1.0) {
                 self.addedPorts()
             }
         }
-        detector.removedDeviceHandler = {
-            self.removedPorts()
-        }
+        detector.removedDeviceHandler = { self.removedPorts() }
         detector.start()
         
-        // MARK: ★★★ Sleep/Wake ★★★
         let wsnc = NSWorkspace.shared.notificationCenter
         sleepObserver = wsnc.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: nil) { [weak self] (n) in
             self?.availablePorts.forEach { (port) in
@@ -65,7 +57,6 @@ public class Serial:ObservableObject{
             }
         }
         
-        // MARK: ★★★ Terminate ★★★
         let nc = NotificationCenter.default
         terminateObserver = nc.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: nil) { [weak self] (n) in
             self?.availablePorts.forEach({ (port) in
@@ -75,7 +66,6 @@ public class Serial:ObservableObject{
         }
     }
     
-    // MARK: ★★★ Serial Ports ★★★
     private func setAvailablePorts() {
         let device = findDevice()
         let portList = getPortList(device)
@@ -105,12 +95,12 @@ public class Serial:ObservableObject{
     private func removedPorts() {
         let device = findDevice()
         let portList = getPortList(device)
-        let removedPorts: [SerialPort] = availablePorts.filter { (port) -> Bool in
+        let removedPorts: [SerialPort] = availablePorts.filter { port -> Bool in
             return !portList.contains(port.name)
         }
-        removedPorts.forEach { (port) in
+        removedPorts.forEach { port in
             port.portRemoved()
-            availablePorts = availablePorts.filter({ (availablePort) -> Bool in
+            availablePorts = availablePorts.filter({ availablePort -> Bool in
                 return port.name != availablePort.name
             })
             ports = ports.filter{$0 != port.name}

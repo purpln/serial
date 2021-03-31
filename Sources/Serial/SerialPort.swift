@@ -1,54 +1,31 @@
 import Foundation
 
-public enum SerialPortState: Int {
-    case open
-    case close
-    case sleeping
-    case removed
-}
-
-public enum SerialParity: Int {
-    case none
-    case even
-    case odd
-}
-
 public class SerialPort {
     private var fileDescriptor: Int32 = 0
     private var originalPortOptions = termios()
     private var readTimer: DispatchSourceTimer?
     
     public private(set) var name: String = ""
-    public private(set) var state: SerialPortState = .close
+    public private(set) var state: State = .close
     
-    public var baudRate: BaudRate = .baud115200 {
-        didSet { setOptions() }
-    }
-    public var parity:SerialParity = .none {
-        didSet { setOptions() }
-    }
-    public var stopBits: UInt32 = 1 {
-        didSet { setOptions() }
-    }
+    public var baudRate: BaudRate = .baud115200 { didSet { setOptions() } }
+    public var parity: Parity = .none { didSet { setOptions() } }
+    public var stopBits: UInt32 = 1 { didSet { setOptions() } }
     
-    //
+    public enum State { case open, close, sleeping, removed }
+    public enum Parity { case none, even, odd }
+    
     public var received: ((_ texts: String) -> Void)?
     public var failure: ((_ port: SerialPort) -> Void)?
     public var opened: ((_ port: SerialPort) -> Void)?
     public var closed: ((_ port: SerialPort) -> Void)?
     public var removed: ((_ port: SerialPort) -> Void)?
     
-    public init(_ portName: String) {
-        name = portName
-    }
+    public init(_ portName: String) { name = portName }
     
-    deinit {
-        close()
-    }
+    deinit { close() }
     
-    private func error(_ n: Int) {
-        failure?(self)
-    }
+    private func error(_ n: Int) { failure?(self) }
     
     public func open() {
         var fd: Int32 = -1
@@ -94,7 +71,6 @@ public class SerialPort {
         Darwin.write(fileDescriptor, &bytes, bytes.count)
     }
     
-    // ★★★ Set Options ★★★ //
     private func setOptions() {
         if fileDescriptor < 1 { return }
         var options = termios()
@@ -177,7 +153,7 @@ public class SerialPort {
     
 }
 
-extension termios {
+private extension termios {
     mutating func updateC_CC(_ n: Int32, v: UInt8) {
         switch n {
         case  0: c_cc.0  = v

@@ -14,7 +14,6 @@ final class SerialDetector {
         let runLoop = IONotificationPortGetRunLoopSource(notificationPort)!.takeRetainedValue()
         CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoop, CFRunLoopMode.defaultMode)
         
-        // MARK: ★★★ Added Notification ★★★ //
         let addedCallback: IOServiceMatchingCallback = { (pointer, iterator) in
             let detector = Unmanaged<SerialDetector>.fromOpaque(pointer!).takeUnretainedValue()
             detector.addedDeviceHandler?()
@@ -27,7 +26,6 @@ final class SerialDetector {
             IOObjectRelease(device)
         }
         
-        // MARK: ★★★ Removed Notification ★★★ //
         let removedCallback: IOServiceMatchingCallback = { (pointer, iterator) in
             let watcher = Unmanaged<SerialDetector>.fromOpaque(pointer!).takeUnretainedValue()
             watcher.removedDeviceHandler?()
