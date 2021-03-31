@@ -7,7 +7,6 @@ public class SerialPort {
     
     public private(set) var name: String = ""
     public private(set) var state: State = .close
-    public private(set) var id: UUID = UUID()
     
     public var baudRate: BaudRate = .baud115200 { didSet { setOptions() } }
     public var parity: Parity = .none { didSet { setOptions() } }

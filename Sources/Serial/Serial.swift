@@ -73,6 +73,7 @@ public class Serial {
             ports.append(portName)
             availablePorts.append(SerialPort(portName))
         }
+        delegate?.ports(ports: availablePorts)
     }
     
     private func addedPorts() {
@@ -89,6 +90,7 @@ public class Serial {
                 ports.insert(portName, at: 0)
             }
         }
+        delegate?.ports(ports: availablePorts)
         //updatedAvailablePortsHandler?()
     }
     
@@ -105,6 +107,7 @@ public class Serial {
             })
             ports = ports.filter{$0 != port.name}
         }
+        delegate?.ports(ports: availablePorts)
         //updatedAvailablePortsHandler?()
     }
     
