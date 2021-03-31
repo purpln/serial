@@ -8,12 +8,9 @@ public protocol SerialProtocol {
 
 public class Serial {
     public static let shared: Serial = Serial()
-    public var delegate: SerialProtocol?
+    public private(set) var delegate: SerialProtocol?
+    public private(set) var ports = [SerialPort]()
     
-    public private(set) var ports: [String] = []
-    public private(set) var availablePorts = [SerialPort]()
-    //public var updatedAvailablePortsHandler: (() -> Void)?
-
     private let detector = SerialDetector()
     private var sleepObserver: NSObjectProtocol?
     private var wakeObserver: NSObjectProtocol?
@@ -43,14 +40,14 @@ public class Serial {
         
         let wsnc = NSWorkspace.shared.notificationCenter
         sleepObserver = wsnc.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: nil) { [weak self] (n) in
-            self?.availablePorts.forEach { (port) in
+            self?.ports.forEach { (port) in
                 if port.state == .open {
                     port.fallSleep()
                 }
             }
         }
         wakeObserver = wsnc.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: nil) { [weak self] (n) in
-            self?.availablePorts.forEach { (port) in
+            self?.ports.forEach { (port) in
                 if port.state == .sleeping {
                     port.wakeUp()
                 }
@@ -59,10 +56,10 @@ public class Serial {
         
         let nc = NotificationCenter.default
         terminateObserver = nc.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: nil) { [weak self] (n) in
-            self?.availablePorts.forEach({ (port) in
+            self?.ports.forEach{ port in
                 port.close()
-            })
-            self?.availablePorts.removeAll()
+            }
+            self?.ports.removeAll()
         }
     }
     
@@ -70,46 +67,37 @@ public class Serial {
         let device = findDevice()
         let portList = getPortList(device)
         portList.forEach { portName in
-            ports.append(portName)
-            print(portName)
-            availablePorts.append(SerialPort(portName))
+            ports.append(SerialPort(portName))
         }
-        delegate?.ports(ports: availablePorts)
+        delegate?.ports(ports: ports)
     }
     
     private func addedPorts() {
         let device = findDevice()
         let portList = getPortList(device)
         portList.forEach { portName in
-            if !availablePorts.contains(where: { port -> Bool in
-                return port.name == portName
+            if !ports.contains(where: { port -> Bool in
+                port.name == portName
             }) {
-                availablePorts.insert(SerialPort(portName), at: 0)
-            }
-            
-            if !ports.contains(portName){
-                ports.insert(portName, at: 0)
+                ports.insert(SerialPort(portName), at: 0)
             }
         }
-        delegate?.ports(ports: availablePorts)
-        //updatedAvailablePortsHandler?()
+        delegate?.ports(ports: ports)
     }
     
     private func removedPorts() {
         let device = findDevice()
         let portList = getPortList(device)
-        let removedPorts: [SerialPort] = availablePorts.filter { port -> Bool in
+        let removedPorts: [SerialPort] = ports.filter { port -> Bool in
             return !portList.contains(port.name)
         }
         removedPorts.forEach { port in
             port.portRemoved()
-            availablePorts = availablePorts.filter({ availablePort -> Bool in
-                return port.name != availablePort.name
-            })
-            ports = ports.filter{$0 != port.name}
+            ports = ports.filter{ availablePort -> Bool in
+                port.name != availablePort.name
+            }
         }
-        delegate?.ports(ports: availablePorts)
-        //updatedAvailablePortsHandler?()
+        delegate?.ports(ports: ports)
     }
     
     private func findDevice() -> io_iterator_t {
