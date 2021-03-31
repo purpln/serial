@@ -8,7 +8,7 @@ public protocol SerialProtocol {
 
 public class Serial {
     public static let shared: Serial = Serial()
-    public private(set) var delegate: SerialProtocol?
+    public var delegate: SerialProtocol?
     public private(set) var ports = [SerialPort]()
     
     private let detector = SerialDetector()
