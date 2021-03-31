@@ -5,7 +5,7 @@ public class SerialPort {
     private var originalPortOptions = termios()
     private var readTimer: DispatchSourceTimer?
     
-    public private(set) var name: String = ""
+    public private(set) var port: String = ""
     public private(set) var state: State = .close
     
     public var baudRate: BaudRate = .baud115200 { didSet { setOptions() } }
@@ -15,22 +15,22 @@ public class SerialPort {
     public enum State { case open, close, sleeping, removed }
     public enum Parity { case none, even, odd }
     
-    public var received: ((_ texts: String) -> Void)?
-    public var failure: ((_ port: SerialPort) -> Void)?
-    public var opened: ((_ port: SerialPort) -> Void)?
-    public var closed: ((_ port: SerialPort) -> Void)?
-    public var removed: ((_ port: SerialPort) -> Void)?
+    public var received: ((String) -> Void)?
+    public var failure: ((Int) -> Void)?
+    public var opened: ((SerialPort) -> Void)?
+    public var closed: ((SerialPort) -> Void)?
+    public var removed: ((SerialPort) -> Void)?
     
-    public init(_ portName: String) { name = portName }
+    public init(_ port: String) { self.port = port }
     
     deinit { close() }
     
-    private func error(_ n: Int) { failure?(self) }
+    private func error(_ n: Int) { failure?(n) }
     
     public func open() {
         var fd: Int32 = -1
         
-        fd = Darwin.open(name.cString(using: String.Encoding.ascii)!, O_RDWR | O_NOCTTY | O_NONBLOCK)
+        fd = Darwin.open(port.cString(using: String.Encoding.ascii)!, O_RDWR | O_NOCTTY | O_NONBLOCK)
         if fd == -1 { return error(1) }
         if fcntl(fd, F_SETFL, 0) == -1 { return error(2) }
         

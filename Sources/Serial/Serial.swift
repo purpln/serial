@@ -77,7 +77,7 @@ public class Serial {
         let portList = getPortList(device)
         portList.forEach { portName in
             if !ports.contains(where: { port -> Bool in
-                port.name == portName
+                port.port == portName
             }) {
                 ports.insert(SerialPort(portName), at: 0)
             }
@@ -89,12 +89,12 @@ public class Serial {
         let device = findDevice()
         let portList = getPortList(device)
         let removedPorts: [SerialPort] = ports.filter { port -> Bool in
-            return !portList.contains(port.name)
+            !portList.contains(port.port)
         }
         removedPorts.forEach { port in
             port.portRemoved()
-            ports = ports.filter{ availablePort -> Bool in
-                port.name != availablePort.name
+            ports = ports.filter { available -> Bool in
+                port.port != available.port
             }
         }
         delegate?.ports(ports: ports)
@@ -109,10 +109,7 @@ public class Serial {
         let allTypes = Unmanaged.passRetained(allTypes_cf).autorelease().toOpaque()
         CFDictionarySetValue(matchingDict, typeKey, allTypes)
         let result = IOServiceGetMatchingServices(kIOMasterPortDefault, matchingDict, &portIterator)
-        if result != KERN_SUCCESS {
-            print("error")
-            return 0
-        }
+        if result != KERN_SUCCESS { return 0 }
         return portIterator
     }
     
