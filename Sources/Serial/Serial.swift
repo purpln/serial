@@ -71,6 +71,7 @@ public class Serial {
         let portList = getPortList(device)
         portList.forEach { portName in
             ports.append(portName)
+            print(portName)
             availablePorts.append(SerialPort(portName))
         }
         delegate?.ports(ports: availablePorts)
